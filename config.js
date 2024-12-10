@@ -18,7 +18,7 @@ const config = {
 	AUTO_STATUS_READ: process.env.AUTO_STATUS_READ || false,
 	CMD_REACT: process.env.CMD_REACT || true,
 	WARN_COUNT: process.env.WARN_COUNT || 3,
-	MODE: process.env.MODE || 'private',
+	MODE: process.env.MODE || 'public',
 	TIME_ZONE: process.env.TZ || process.env.TIME_ZONE || 'Africa/Lagos',
 	VERSION: require('./package.json').version,
 	BASE_API_URL: 'https://xstro-api-ec3ad328e76f.herokuapp.com',
