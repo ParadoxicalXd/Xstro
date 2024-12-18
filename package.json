@@ -35,6 +35,7 @@
 	"homepage": "https://github.com/AstroX11/xstro#readme",
 	"author": "AstroX11 <danielfx0012@gmail.com>",
 	"dependencies": {
+		"qrcode-terminal": "^0.12.0",
 		"axios": "^1.7.9",
 		"baileys": "github:AstroX11/Baileys",
 		"cheerio": "^1.0.0",
