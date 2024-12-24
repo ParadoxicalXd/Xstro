@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 
-const NotesDB = DATABASE.define(
+export const NotesDB = DATABASE.define(
 	'NotesDB',
 	{
 		id: {
@@ -60,5 +60,3 @@ export async function getNote(id) {
 	const note = await NotesDB.findByPk(id);
 	return note;
 }
-
-export default NotesDB;

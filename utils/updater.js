@@ -11,16 +11,6 @@ export async function updateBot() {
 	}
 }
 
-export async function upgradeBot() {
-	try {
-		execSync('yarn upgrade');
-		execSync('npm start');
-		return { success: true };
-	} catch {
-		return false;
-	}
-}
-
 export async function isLatest() {
 	try {
 		execSync('git fetch');

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { join, basename, extname } from 'path';
 import axios from 'axios';
-import { addPlugin, getPlugins, removePlugin } from '#sql/plugins';
+import { addPlugin, getPlugins, removePlugin } from '#sql';
 
 /**
  * Install a plugin from a URL.

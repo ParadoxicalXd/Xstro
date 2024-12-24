@@ -1,4 +1,4 @@
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 import { DataTypes, Op } from 'sequelize';
 
 const Antilink = DATABASE.define(
@@ -122,5 +122,6 @@ async function incrementWarningCount(jid, type) {
 async function resetWarningCount(jid, type) {
 	await saveWarningCount(jid, type, 0);
 }
+
 
 export { Antilink, setAntilink, removeAntilink, getAntilink, saveWarningCount, incrementWarningCount, resetWarningCount };

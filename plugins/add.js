@@ -1,11 +1,11 @@
 // import baileys from 'baileys';
 // const { generateWAMessageFromContent, getBinaryNodeChild, proto } = baileys;
-// import { bot } from '#lib/cmds';
+// import { bot } from '#lib';
 
 // bot(
 // 	{
 // 		pattern: 'add',
-// 		isPublic: false,
+// 		public: false,
 // 		isGroup: true,
 // 		desc: 'Adds a user to the group',
 // 	},
@@ -13,7 +13,7 @@
 // 		if (!message.isAdmin) return message.send('```You are not an Admin```');
 // 		if (!message.isBotAdmin) return message.send('```I am not an Admin```');
 
-// 		const jid = await message.thatJid(match);
+// 		const jid = await message.getUserJid(match);
 
 // 		try {
 // 			const pp = await message.client.profilePictureUrl(message.jid).catch(() => null);

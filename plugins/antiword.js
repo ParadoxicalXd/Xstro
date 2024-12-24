@@ -1,12 +1,13 @@
-import { bot } from '#lib/cmds';
-import { setAntiWordStatus, getAntiWords, addAntiWords, removeAntiWords } from '#sql/antiword';
+import { bot } from '#lib';
+import { setAntiWordStatus, getAntiWords, addAntiWords, removeAntiWords } from '#sql';
 
 bot(
 	{
 		pattern: 'antiword',
-		isPublic: true,
+		public: true,
 		isGroup: true,
 		desc: 'Set Antiword Management for Group Chats',
+		type: 'group'
 	},
 	async (message, match) => {
 		const jid = message.jid;

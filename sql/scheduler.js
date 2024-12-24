@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 
-const Scheduler = DATABASE.define(
+export const schedule = DATABASE.define(
 	'Schedule',
 	{
 		groupId: {
@@ -31,5 +31,3 @@ const Scheduler = DATABASE.define(
 		tableName: 'schedules',
 	},
 );
-
-export default Scheduler;

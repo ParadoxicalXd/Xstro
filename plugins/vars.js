@@ -1,10 +1,11 @@
-import { bot } from '#lib/cmds';
-import { manageVar } from '#utils/variables';
+import { bot } from '#lib';
+import { manageVar } from '#utils';
 
 bot(
 	{
 		pattern: 'setvar',
-		isPublic: false,
+		public: false,
+		type: "system",
 		desc: 'Set system var',
 	},
 	async (message, match) => {
@@ -20,7 +21,8 @@ bot(
 bot(
 	{
 		pattern: 'delvar',
-		isPublic: false,
+		public: false,
+		type: "system",
 		desc: 'Delete system var',
 	},
 	async (message, match) => {
@@ -34,7 +36,8 @@ bot(
 bot(
 	{
 		pattern: 'getvar',
-		isPublic: false,
+		public: false,
+		type: "system",
 		desc: 'Get system vars',
 	},
 	async message => {

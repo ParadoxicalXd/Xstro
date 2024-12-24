@@ -1,28 +1,28 @@
-import { bot } from '#lib/cmds';
-import { getName, loadMessage } from '#sql/store';
-import { numtoId } from '#lib/utils';
-import { smsg } from '#lib/message';
-import config from '../config.js';
+import config from '#config';
+import { getName, loadMessage } from '#sql';
+import { bot, numtoId, smsg } from '#lib';
 import { getBuffer } from 'xstro-utils';
 import { isJidGroup } from 'baileys';
 
 bot(
 	{
 		pattern: 'vv',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Download ViewOnce Messages',
 	},
 	async message => {
 		if (!message.reply_message.viewonce) return message.send('_Reply A ViewOnce_');
 		const media = await message.download();
-		return await message.send(media);
+		return await message.forward(media);
 	},
 );
 
 bot(
 	{
 		pattern: 'myname',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Changes your WhatsApp Name',
 	},
 	async (message, match) => {
@@ -35,7 +35,8 @@ bot(
 bot(
 	{
 		pattern: 'setpp',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Set Your Profile Picture',
 	},
 	async message => {
@@ -49,7 +50,8 @@ bot(
 bot(
 	{
 		pattern: 'quoted',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'quoted message',
 	},
 	async message => {
@@ -66,7 +68,8 @@ bot(
 bot(
 	{
 		pattern: 'dlt',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Deletes Message',
 	},
 	async message => {
@@ -78,7 +81,8 @@ bot(
 bot(
 	{
 		pattern: 'archive',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'archive whatsapp chat',
 	},
 	async message => {
@@ -90,7 +94,8 @@ bot(
 bot(
 	{
 		pattern: 'unarchive',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'unarchive whatsapp chat',
 	},
 	async message => {
@@ -102,7 +107,8 @@ bot(
 bot(
 	{
 		pattern: 'blocklist',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Fetches BlockList',
 	},
 	async message => {
@@ -120,7 +126,8 @@ bot(
 bot(
 	{
 		pattern: 'clear ?(.*)',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'delete whatsapp chat',
 	},
 	async message => {
@@ -132,7 +139,8 @@ bot(
 bot(
 	{
 		pattern: 'rpp',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Removes Profile Picture',
 	},
 	async message => {
@@ -144,7 +152,8 @@ bot(
 bot(
 	{
 		pattern: 'pin',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'pin a chat',
 	},
 	async message => {
@@ -156,7 +165,8 @@ bot(
 bot(
 	{
 		pattern: 'unpin ?(.*)',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'unpin a msg',
 	},
 	async message => {
@@ -168,7 +178,8 @@ bot(
 bot(
 	{
 		pattern: 'save',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Saves Status',
 	},
 	async message => {
@@ -181,7 +192,8 @@ bot(
 bot(
 	{
 		pattern: 'forward',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Forwards A Replied Message',
 	},
 	async (message, match) => {
@@ -206,11 +218,12 @@ bot(
 bot(
 	{
 		pattern: 'block',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Blocks A Person',
 	},
 	async (message, match) => {
-		const jid = await message.thatJid(match);
+		const jid = await message.getUserJid(match);
 		await message.Block(jid);
 	},
 );
@@ -218,11 +231,12 @@ bot(
 bot(
 	{
 		pattern: 'unblock',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Unblocks A Person',
 	},
 	async (message, match) => {
-		const jid = await message.thatJid(match);
+		const jid = await message.getUserJid(match);
 		await message.Unblock(jid);
 	},
 );
@@ -230,7 +244,8 @@ bot(
 bot(
 	{
 		pattern: 'edit',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Edits A Sent Message',
 	},
 	async (message, match, { prefix }) => {
@@ -243,11 +258,12 @@ bot(
 bot(
 	{
 		pattern: 'jid',
-		isPublic: true,
+		public: true,
+		type: "whatsapp",
 		desc: 'Get Jid of Current Chat',
 	},
 	async message => {
-		const jid = await message.thatJid();
+		const jid = await message.getUserJid();
 		message.send(jid);
 	},
 );
@@ -255,7 +271,8 @@ bot(
 bot(
 	{
 		pattern: 'bio',
-		isPublic: true,
+		public: true,
+		type: "whatsapp",
 		desc: 'Change your whatsapp bio',
 	},
 	async (message, match, { prefix }) => {
@@ -268,7 +285,8 @@ bot(
 bot(
 	{
 		pattern: 'react',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'React to A Message',
 	},
 	async (message, match) => {
@@ -282,7 +300,8 @@ bot(
 bot(
 	{
 		pattern: 'star',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Stars or Unstars a Message',
 	},
 	async message => {
@@ -298,7 +317,8 @@ bot(
 bot(
 	{
 		pattern: 'unstar',
-		isPublic: false,
+		public: false,
+		type: "whatsapp",
 		desc: 'Stars or Unstars a Message',
 	},
 	async message => {
@@ -314,7 +334,8 @@ bot(
 bot(
 	{
 		pattern: 'owner',
-		isPublic: true,
+		public: true,
+		type: "whatsapp",
 		desc: 'Get Bot Owner',
 	},
 	async message => {
@@ -343,14 +364,55 @@ bot(
 	},
 );
 bot(
-	
 	{
-	  pattern: 'gjid',
-	  isPublic: true,
-	  isGroup: true,
-	  desc: 'Get JID of the Current Group',
+		pattern: 'gjid',
+		public: true,
+		type: "whatsapp",
+		isGroup: true,
+		desc: 'Get JID of the Current Group',
 	},
-	async (message) => {
-		 message.send(`Group JID: ${message.jid}`);
-	}
-  );
+	async message => {
+		message.send(`Group JID: ${message.jid}`);
+	},
+);
+
+
+
+//======================================================
+
+bot({
+    pattern: 'gforward',
+    public: false,
+    type: 'whatsapp',
+    desc: 'Forwards a replied message to multiple groups',
+},
+async (message, match) => {
+    if (!message.reply_message) return message.send('_Reply to a message to forward it!_');
+    if (!match) return message.send('_Provide a comma-separated list of group JIDs._');
+
+    const groupJids = match.split(',').map(jid => jid.trim()).filter(isJidGroup);
+
+    if (groupJids.length === 0) {
+        return message.send('_You must provide valid group JIDs._');
+    }
+
+    const msg = message.data?.quoted;
+    let successfulForwards = 0;
+    let failedForwards = 0;
+
+    for (const jid of groupJids) {
+        try {
+            await message.forward(jid, msg, { quoted: msg });
+            successfulForwards++;
+        } catch (error) {
+            console.error(`Failed to forward to ${jid}:`, error);
+            failedForwards++;
+        }
+    }
+
+    return message.send(
+        `_Message forwarded to ${successfulForwards} group(s). Failed to forward to ${failedForwards} group(s)._`
+    );
+});
+
+

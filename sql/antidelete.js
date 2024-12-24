@@ -1,7 +1,7 @@
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 import { DataTypes } from 'sequelize';
 
-const AntiDelDB = DATABASE.define(
+export const AntiDelDB = DATABASE.define(
 	'AntiDelete',
 	{
 		id: {
@@ -102,5 +102,3 @@ export async function getAllAntiDeleteSettings() {
 		return [];
 	}
 }
-
-export default AntiDelDB;

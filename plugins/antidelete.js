@@ -1,12 +1,13 @@
-import { bot } from '#lib/cmds';
-import { getAnti, setAnti, initializeAntiDeleteSettings } from '#sql/antidelete';
+import { bot } from '#lib';
+import { getAnti, setAnti, initializeAntiDeleteSettings } from '#sql';
 initializeAntiDeleteSettings();
 
 bot(
 	{
 		pattern: 'antidelete',
-		isPublic: false,
+		public: false,
 		desc: 'Setup Antidelete',
+		type: 'user',
 	},
 	async (message, match) => {
 		const command = match?.toLowerCase();
@@ -14,31 +15,45 @@ bot(
 		if (command === 'on') {
 			await setAnti('gc', false);
 			await setAnti('dm', false);
-			return await message.send('_AntiDelete is now off for Group Chats and Direct Messages by default. Use "set gc" or "set dm" to enable._');
+			return await message.send(
+				'_AntiDelete is now off for Group Chats and Direct Messages by default. Use "set gc" or "set dm" to enable._',
+			);
 		}
 
 		if (command === 'off gc') {
 			await setAnti('gc', false);
-			return await message.send('_AntiDelete for Group Chats is now disabled._');
+			return await message.send(
+				'_AntiDelete for Group Chats is now disabled._',
+			);
 		}
 
 		if (command === 'off dm') {
 			await setAnti('dm', false);
-			return await message.send('_AntiDelete for Direct Messages is now disabled._');
+			return await message.send(
+				'_AntiDelete for Direct Messages is now disabled._',
+			);
 		}
 
 		if (command === 'set gc') {
 			const currentStatus = await getAnti('gc');
 			const newStatus = !currentStatus;
 			await setAnti('gc', newStatus);
-			return await message.send(`_AntiDelete for Group Chats ${newStatus ? 'enabled' : 'disabled'}_`);
+			return await message.send(
+				`_AntiDelete for Group Chats ${
+					newStatus ? 'enabled' : 'disabled'
+				}_`,
+			);
 		}
 
 		if (command === 'set dm') {
 			const currentStatus = await getAnti('dm');
 			const newStatus = !currentStatus;
 			await setAnti('dm', newStatus);
-			return await message.send(`_AntiDelete for Direct Messages ${newStatus ? 'enabled' : 'disabled'}_`);
+			return await message.send(
+				`_AntiDelete for Direct Messages ${
+					newStatus ? 'enabled' : 'disabled'
+				}_`,
+			);
 		}
 
 		if (command === 'set all') {
@@ -52,8 +67,12 @@ bot(
 			const gcStatus = await getAnti('gc');
 
 			let statusMessage = '_AntiDelete Status_\n\n';
-			statusMessage += `*DM AntiDelete:* ${dmStatus ? 'Enabled' : 'Disabled'}\n`;
-			statusMessage += `*Group Chat AntiDelete:* ${gcStatus ? 'Enabled' : 'Disabled'}\n`;
+			statusMessage += `*DM AntiDelete:* ${
+				dmStatus ? 'Enabled' : 'Disabled'
+			}\n`;
+			statusMessage += `*Group Chat AntiDelete:* ${
+				gcStatus ? 'Enabled' : 'Disabled'
+			}\n`;
 			return await message.send(statusMessage);
 		}
 

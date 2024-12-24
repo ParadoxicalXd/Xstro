@@ -1,7 +1,7 @@
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 import { DataTypes, Op } from 'sequelize';
 
-const FiltersDB = DATABASE.define(
+export const FiltersDB = DATABASE.define(
 	'filters',
 	{
 		id: {
@@ -85,4 +85,4 @@ export async function getFilters(type) {
 	}));
 }
 
-export default FiltersDB;
+

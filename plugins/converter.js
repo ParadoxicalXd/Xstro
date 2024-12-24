@@ -1,134 +1,135 @@
-import { getBuffer, getJson } from 'xstro-utils';
-import { bot } from '#lib/cmds';
-import { convertToOpus, flipMedia, generatePdf, StickerToPhoto, toBlackVideo, toSticker } from '#lib/xstro';
-import config from '../config.js';
+import { bot } from '#lib';
+import { upload, XSTRO } from '#utils';
 
 bot(
 	{
 		pattern: 'sticker',
-		isPublic: true,
-		desc: 'Converts Images/Video to Sticker',
+		public: true,
+		desc: 'Converts Images and Videos to Sticker',
+		type: 'converter',
 	},
 	async message => {
-		const media = message.reply_message?.video || message.reply_message?.image;
-		if (!media) return message.send('_Reply with an Image or Video!_');
-		const msg = await message.download();
-		const stickerBuffer = await toSticker(msg);
-		await message.send(stickerBuffer, { type: 'sticker' });
-	},
-);
-
-bot(
-	{
-		pattern: 'take',
-		isPublic: true,
-		desc: 'Resends Sticker As Own',
-	},
-	async message => {
-		if (!message.reply_message?.sticker) return message.send('_Reply Sticker_');
-		const msg = await message.download();
-		const buff = await toSticker(msg);
-		return await message.send(buff, { type: 'sticker' });
-	},
-);
-
-bot(
-	{
-		pattern: 'rotate',
-		isPublic: true,
-		desc: 'Rotates Media to a particular direction',
-	},
-	async (message, match) => {
-		if (!message.reply_message?.image && !message.reply_message?.video) return message.send('_Reply to an Image or Video_');
-		const options = ['left', 'right', 'vertical', 'horizontal'];
-		if (!options.includes(match)) return message.send('_Choose a valid option:_ ' + message.prefix + 'flip left, right, vertical, or horizontal');
-		const buff = await message.download();
-		const flippedMedia = await flipMedia(buff, match);
-		return await message.send(flippedMedia, { caption: '_Flipped successfully_' });
-	},
-);
-
-bot(
-	{
-		pattern: 'black',
-		isPublic: true,
-		desc: 'Converts Audio to Black Video',
-	},
-	async message => {
-		if (!message.reply_message?.audio) return message.send('_Reply An Audio_');
-		const buff = await message.download();
-		const res = await toBlackVideo(buff);
-		return await message.send(res);
-	},
-);
-
-bot(
-	{
-		pattern: 'ppt',
-		isPublic: true,
-		desc: 'Converts Audio to PPT',
-	},
-	async message => {
-		if (!message.reply_message?.audio) return message.send('_Reply An Audio_');
-		const media = await message.download();
-		const buff = await convertToOpus(media);
-		return await message.send(buff);
-	},
-);
-
-bot(
-	{
-		pattern: 'emix',
-		isPublic: true,
-		desc: 'Mix two emojis to be one',
-	},
-	async (message, match) => {
-		const isTwoEmojis = str => /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F){2}$/u.test(str);
-		if (!isTwoEmojis(match)) return message.send('_Give me two emojis_');
-		const res = await getJson('https://levanter.onrender.com/emix?q=' + match + '');
-		const buff = await getBuffer(res.result);
-		const sticker = await toSticker(buff);
+		let media;
+		if (
+			!message.reply_message ||
+			(!message.reply_message.image && !message.reply_message.video)
+		)
+			return message.send('_Reply with an Image or Video_');
+		media = await message.download();
+		let url = await upload(media);
+		const sticker = await XSTRO.makeSticker(url.rawUrl);
 		return await message.send(sticker, { type: 'sticker' });
 	},
 );
 
 bot(
 	{
-		pattern: 'togif',
-		isPublic: true,
-		desc: 'Converts An Image to Gif',
+		pattern: 'take',
+		public: true,
+		desc: 'rebrands a sticker to bot',
+		type: 'converter',
 	},
 	async message => {
-		if (!message.reply_message?.video) return message.send('_Reply A Video Only!_');
-		const video = await message.download();
-		return await message.send(video, { caption: '_success!_', gifPlayback: true });
+		let media;
+		if (!message.reply_message.sticker)
+			return message.send('_Reply a sticker only!_');
+		media = await message.download();
+		let url = await upload(media);
+		const sticker = await XSTRO.makeSticker(url.rawUrl);
+		return await message.send(sticker, { type: 'sticker' });
 	},
 );
 
 bot(
 	{
-		pattern: 'topdf',
-		isPublic: true,
-		desc: 'Converts text to Pdf',
+		pattern: 'flip',
+		public: true,
+		desc: 'Flip media left/right/vertical/horizontal',
+		type: 'converter',
 	},
 	async (message, match) => {
-		const text = match || message.reply_message?.text;
-		if (!text) return message.send('_Give Me to convert to pdf_');
-		const doc = await generatePdf(text.trim());
-		return await message.send(doc, { type: 'document', fileName: config.BOT_INFO.split(';')[1] || 'xstro' });
+		const { reply_message } = message;
+		if (!reply_message?.image && !reply_message?.video)
+			return message.send('_Reply to an Image or Video_');
+
+		const validDirections = ['left', 'right', 'vertical', 'horizontal'];
+		if (!validDirections.includes(match))
+			return message.send(
+				`_Usage: ${message.prefix}flip <${validDirections.join(
+					'/',
+				)}>`,
+			);
+
+		const media = await message.download();
+		const { rawUrl } = await upload(media);
+		const flipped = await XSTRO.flipMedia(rawUrl, match);
+
+		return message.send(flipped, { caption: '_Flipped successfully_' });
+	},
+);
+
+bot(
+	{
+		pattern: 'black',
+		public: true,
+		desc: 'Converts Audio to Black Video',
+		type: 'converter',
+	},
+	async message => {
+		let media;
+		if (!message.reply_message.audio)
+			return message.send('_Reply Audio_');
+		media = await message.download();
+		const url = await upload(media);
+		const video = await XSTRO.blackvideo(url.rawUrl);
+		return await message.send(video);
+	},
+);
+
+bot(
+	{
+		pattern: 'ttp',
+		public: true,
+		desc: 'Designs ttp Stickers',
+		type: 'converter',
+	},
+	async (message, match, { prefix }) => {
+		if (!match) return message.send(`_Usage: ${prefix}ttp Astro_`);
+		const buff = await XSTRO.ttp(match);
+		const { rawUrl } = await upload(buff);
+		const sticker = await XSTRO.makeSticker(rawUrl);
+		return await message.send(sticker, { type: 'sticker' });
 	},
 );
 
 bot(
 	{
 		pattern: 'photo',
-		isPublic: true,
-		desc: 'Converts Sticker to Photo',
+		public: true,
+		desc: 'Convert Sticker to Photo',
+		type: 'converter',
 	},
 	async message => {
-		if (!message.reply_message?.sticker) return message.send('_Reply A Sticker_');
-		const sticker = await message.download();
-		const image = await StickerToPhoto(sticker);
-		return await message.send(image);
+		if (!message.reply_message.sticker)
+			return message.send('_Reply Sticker_');
+		const { rawUrl } = await upload(await message.download());
+		const img = await XSTRO.photo(rawUrl);
+		return await message.send(img);
+	},
+);
+
+bot(
+	{
+		pattern: 'mp3',
+		public: true,
+		desc: 'Convert Video to Audio',
+		type: 'converter',
+	},
+	async message => {
+		if (!message.reply_message.video)
+			return message.send('_Reply Video_');
+		const { rawUrl } = await upload(await message.download());
+		const mp3 = await XSTRO.mp3(rawUrl);
+		return await message.send(mp3);
 	},
 );

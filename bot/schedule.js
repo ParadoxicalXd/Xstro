@@ -1,5 +1,5 @@
-import config from '../config.js';
-import Scheduler from '#sql/scheduler';
+import config from '#config';
+import { schedule } from '#sql';
 
 const getCurrentTime = () => {
 	const timezone = config.TIME_ZONE;
@@ -19,11 +19,12 @@ const getCurrentTime = () => {
 	}
 };
 
-export const schedules = async client => {
+export const schedules = async msg => {
+	const client = msg.client;
 	setInterval(async () => {
 		const currentTime = getCurrentTime();
 
-		const schedules = await Scheduler.findAll({
+		const schedules = await schedule.findAll({
 			where: { isScheduled: true },
 		});
 

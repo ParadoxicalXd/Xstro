@@ -1,4 +1,4 @@
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 import { DataTypes } from 'sequelize';
 
 const AntiWord = DATABASE.define(
@@ -50,7 +50,9 @@ async function setAntiWordStatus(jid, action) {
 
 	return {
 		success: true,
-		message: `Antiword ${action ? 'enabled' : 'disabled'} for group ${jid}`,
+		message: `Antiword ${
+			action ? 'enabled' : 'disabled'
+		} for group ${jid}`,
 	};
 }
 
@@ -148,4 +150,11 @@ async function isAntiWordEnabled(jid) {
 	return record ? record.status : false;
 }
 
-export { AntiWord, setAntiWordStatus, addAntiWords, removeAntiWords, getAntiWords, isAntiWordEnabled };
+export {
+	AntiWord,
+	setAntiWordStatus,
+	addAntiWords,
+	removeAntiWords,
+	getAntiWords,
+	isAntiWordEnabled,
+};

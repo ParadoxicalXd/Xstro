@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 
-const AutoReact = DATABASE.define(
+export const AutoReact = DATABASE.define(
 	'AReact',
 	{
 		status: {
@@ -15,5 +15,3 @@ const AutoReact = DATABASE.define(
 		timestamps: false,
 	},
 );
-
-export default AutoReact;

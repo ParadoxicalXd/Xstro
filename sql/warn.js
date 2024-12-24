@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 
-const WarnDB = DATABASE.define(
+export const WarnDB = DATABASE.define(
 	'Warn',
 	{
 		jid: {
@@ -24,16 +24,22 @@ const WarnDB = DATABASE.define(
 	},
 );
 
+/**
+ * Adds a warning to a user or creates a new user with one warning
+ * @param {string} jid - The unique identifier of the user
+ * @returns {Promise<{success: boolean, warnings: number}>} Object containing success status and current warning count
+ * @async
+ */
 export const addWarn = async jid => {
-	const user = await WarnDB.findOne({ where: { jid } });
-	if (user) {
+	const [user, created] = await WarnDB.upsert(
+		{ jid, warnings: 1 },
+		{ returning: true }
+	);
+	if (!created) {
 		user.warnings += 1;
 		await user.save();
-		return { success: true, warnings: user.warnings };
-	} else {
-		const newUser = await WarnDB.create({ jid, warnings: 1 });
-		return { success: true, warnings: newUser.warnings };
 	}
+	return { success: true, warnings: user.warnings };
 };
 
 export const getWarn = async jid => {
@@ -54,5 +60,3 @@ export const isWarned = async jid => {
 	const user = await WarnDB.findOne({ where: { jid } });
 	return user ? user.warnings > 0 : false;
 };
-
-export default WarnDB;

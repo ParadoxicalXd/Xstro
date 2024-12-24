@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 
-const CONFIG_CMDS = DATABASE.define(
+export const CONFIG_CMDS = DATABASE.define(
 	'CONFIG_CMDS',
 	{
 		id: {
@@ -85,5 +85,7 @@ async function getConfig() {
 				PREFIX: '.',
 		  };
 }
+
+
 
 export { updateConfig, getConfig };

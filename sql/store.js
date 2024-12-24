@@ -1,8 +1,8 @@
 import { isJidGroup } from 'baileys';
 import { DataTypes } from 'sequelize';
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 
-const messageDb = DATABASE.define(
+export const messageDb = DATABASE.define(
 	'message',
 	{
 		jid: {
@@ -25,7 +25,7 @@ const messageDb = DATABASE.define(
 	},
 );
 
-const messageCountDb = DATABASE.define(
+export const messageCountDb = DATABASE.define(
 	'messageCount',
 	{
 		jid: {
@@ -53,7 +53,7 @@ const messageCountDb = DATABASE.define(
 	},
 );
 
-const contactDb = DATABASE.define(
+export const contactDb = DATABASE.define(
 	'contact',
 	{
 		jid: {
@@ -71,7 +71,7 @@ const contactDb = DATABASE.define(
 	},
 );
 
-const groupMetadataDb = DATABASE.define(
+export const groupMetadataDb = DATABASE.define(
 	'groupMetadata',
 	{
 		jid: { type: DataTypes.STRING, allowNull: false, primaryKey: true },
@@ -95,7 +95,7 @@ const groupMetadataDb = DATABASE.define(
 	{ tableName: 'metadata', timestamps: true },
 );
 
-const groupParticipantsDb = DATABASE.define(
+export const groupParticipantsDb = DATABASE.define(
 	'groupParticipants',
 	{
 		jid: { type: DataTypes.STRING, allowNull: false },
@@ -105,19 +105,15 @@ const groupParticipantsDb = DATABASE.define(
 	{ tableName: 'participants', timestamps: false },
 );
 
-const handleError = error => {
-	console.error('Database operation failed:', error);
-};
-
 const saveContact = async (jid, name) => {
 	if (!jid || !name || isJidGroup(jid)) return;
 	const contact = await contactDb.findOne({ where: { jid } });
 	if (contact) {
 		if (contact.name !== name) {
-			await contactDb.update({ name }, { where: { jid } }).catch(handleError);
+			await contactDb.update({ name }, { where: { jid } });
 		}
 	} else {
-		await contactDb.create({ jid, name }).catch(handleError);
+		await contactDb.create({ jid, name });
 	}
 };
 
@@ -129,9 +125,9 @@ const saveMessage = async message => {
 	await saveContact(message.sender, message.pushName);
 	let exists = await messageDb.findOne({ where: { id, jid } });
 	if (exists) {
-		await messageDb.update({ message: msg }, { where: { id, jid } }).catch(handleError);
+		await messageDb.update({ message: msg }, { where: { id, jid } });
 	} else {
-		await messageDb.create({ id, jid, message: msg }).catch(handleError);
+		await messageDb.create({ id, jid, message: msg });
 	}
 };
 
@@ -147,46 +143,64 @@ const getName = async jid => {
 };
 
 const getChatSummary = async () => {
-	try {
-		const distinctChats = await messageDb.findAll({
-			attributes: ['jid'],
-			group: ['jid'],
-		});
+	const distinctChats = await messageDb.findAll({
+		attributes: ['jid'],
+		group: ['jid'],
+	});
 
-		const chatSummaries = await Promise.all(
-			distinctChats.map(async chat => {
-				const jid = chat.jid;
-				const messageCount = await messageDb.count({
-					where: { jid },
-				});
+	const chatSummaries = await Promise.all(
+		distinctChats.map(async chat => {
+			const jid = chat.jid;
+			const messageCount = await messageDb.count({
+				where: { jid },
+			});
 
-				const lastMessage = await messageDb.findOne({
-					where: { jid },
-					order: [['createdAt', 'DESC']],
-				});
+			const lastMessage = await messageDb.findOne({
+				where: { jid },
+				order: [['createdAt', 'DESC']],
+			});
 
-				const chatName = isJidGroup(jid) ? jid : await getName(jid);
+			const chatName = isJidGroup(jid) ? jid : await getName(jid);
 
-				return {
-					jid,
-					name: chatName,
-					messageCount,
-					lastMessageTimestamp: lastMessage ? lastMessage.createdAt : null,
-				};
-			}),
-		);
+			return {
+				jid,
+				name: chatName,
+				messageCount,
+				lastMessageTimestamp: lastMessage
+					? lastMessage.createdAt
+					: null,
+			};
+		}),
+	);
 
-		return chatSummaries.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
-	} catch (error) {
-		console.error('Error retrieving chat summaries:', error);
-		return [];
-	}
+	return chatSummaries.sort(
+		(a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp,
+	);
 };
 
 const saveGroupMetadata = async (jid, client) => {
 	if (!isJidGroup(jid)) return;
 	const groupMetadata = await client.groupMetadata(jid);
-	const { id, subject, subjectOwner, subjectTime, size, creation, owner, desc, descId, linkedParent, restrict, announce, isCommunity, isCommunityAnnounce, joinApprovalMode, memberAddMode, participants, ephemeralDuration } = groupMetadata;
+	const {
+		id,
+		subject,
+		subjectOwner,
+		subjectTime,
+		size,
+		creation,
+		owner,
+		desc,
+		descId,
+		linkedParent,
+		restrict,
+		announce,
+		isCommunity,
+		isCommunityAnnounce,
+		joinApprovalMode,
+		memberAddMode,
+		participants,
+		ephemeralDuration,
+	} = groupMetadata;
 	const metadata = {
 		jid: id,
 		subject,
@@ -220,10 +234,17 @@ const saveGroupMetadata = async (jid, client) => {
 			});
 			if (existingParticipant) {
 				if (existingParticipant.admin !== admin) {
-					await groupParticipantsDb.update({ admin }, { where: { jid, participantId } });
+					await groupParticipantsDb.update(
+						{ admin },
+						{ where: { jid, participantId } },
+					);
 				}
 			} else {
-				await groupParticipantsDb.create({ jid, participantId, admin });
+				await groupParticipantsDb.create({
+					jid,
+					participantId,
+					admin,
+				});
 			}
 		}),
 	);
@@ -246,33 +267,27 @@ const getGroupMetadata = async jid => {
 	};
 };
 
-/**
- * Save or update message count for a specific sender in a group
- * @param {Object} message - The message object
- */
 const saveMessageCount = async message => {
-	const jid = message.key.remoteJid;
-	const sender = message.key.participant || message.sender;
-	if (!jid || !sender) return;
-	if (!isJidGroup(jid)) return;
-	const [record, created] = await messageCountDb.findOrCreate({
-		where: { jid, sender },
-		defaults: { count: 1 },
-	});
-
-	if (!created) {
-		await messageCountDb.increment('count', {
-			by: 1,
+	if (!message) return;
+	try {
+		const jid = message.key.remoteJid;
+		const sender = message.key.participant || message.sender;
+		if (!jid || !sender) return;
+		if (!isJidGroup(jid)) return;
+		const [record, created] = await messageCountDb.findOrCreate({
 			where: { jid, sender },
+			defaults: { count: 1 },
 		});
-	}
+
+		if (!created) {
+			await messageCountDb.increment('count', {
+				by: 1,
+				where: { jid, sender },
+			});
+		}
+	} catch {}
 };
 
-/**
- * Get inactive group members (those with no message count record or zero messages)
- * @param {string} jid - Group JID
- * @returns {Promise<Array>} List of inactive participants
- */
 const getInactiveGroupMembers = async jid => {
 	if (!isJidGroup(jid)) return [];
 
@@ -288,25 +303,21 @@ const getInactiveGroupMembers = async jid => {
 				},
 			});
 
-			// Return participant ID if no message count record exists or count is zero
-			return !messageCount || messageCount.count === 0 ? participant.id : null;
+			return !messageCount || messageCount.count === 0
+				? participant.id
+				: null;
 		}),
 	);
 
 	return inactiveMembers.filter(member => member !== null);
 };
 
-/**
- * Get group members ranked by message count
- * @param {string} jid - Group JID
- * @returns {Promise<Array>} Ranked list of participants by message count
- */
 const getGroupMembersMessageCount = async jid => {
 	if (!isJidGroup(jid)) return [];
 	const messageCounts = await messageCountDb.findAll({
 		where: {
 			jid,
-			count: { [DATABASE.Sequelize.Op.gt]: 0 }, // Only non-zero counts
+			count: { [DATABASE.Sequelize.Op.gt]: 0 },
 		},
 		order: [['count', 'DESC']],
 		attributes: ['sender', 'count'],
@@ -324,9 +335,19 @@ const getGroupMembersMessageCount = async jid => {
 };
 
 const saveMessageV1 = saveMessage;
-const saveMessageV2 = async message => {
-	await saveMessageV1(message);
-	await saveMessageCount(message);
+const saveMessageV2 = message => {
+	return Promise.all([saveMessageV1(message), saveMessageCount(message)]);
 };
 
-export { saveContact, loadMessage, getName, getChatSummary, saveGroupMetadata, getGroupMetadata, saveMessageCount, getInactiveGroupMembers, getGroupMembersMessageCount, saveMessageV2 as saveMessage };
+export {
+	saveContact,
+	loadMessage,
+	getName,
+	getChatSummary,
+	saveGroupMetadata,
+	getGroupMetadata,
+	saveMessageCount,
+	getInactiveGroupMembers,
+	getGroupMembersMessageCount,
+	saveMessageV2 as saveMessage,
+};

@@ -1,10 +1,11 @@
-import { bot } from '#lib/cmds';
-import { isLatest, updateBot, upgradeBot } from '#utils/updater';
+import { bot } from '#lib';
+import { isLatest, updateBot } from '#utils';
 
 bot(
 	{
 		pattern: 'update',
-		isPublic: false,
+		public: false,
+		type: "system",
 		desc: 'Updates Bot',
 	},
 	async (message, match) => {
@@ -20,18 +21,5 @@ bot(
 		} else {
 			return message.send('```Invalid, use ' + message.prefix + 'update now```');
 		}
-	},
-);
-
-bot(
-	{
-		pattern: 'upgrade',
-		isPublic: false,
-		desc: 'Upgrades Bot',
-	},
-	async message => {
-		await message.send('```Upgrading Bot Files```');
-		await upgradeBot();
-		return message.send('```Upgrade Success```');
 	},
 );

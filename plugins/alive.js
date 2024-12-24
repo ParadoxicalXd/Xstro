@@ -1,12 +1,13 @@
-import { bot } from '#lib/cmds';
-import config from '../config.js';
-import { aliveMessage, setAliveMsg } from '#sql/alive';
+import { bot } from '#lib';
+import config from '#config';
+import { aliveMessage, setAliveMsg } from '#sql';
 
 bot(
 	{
 		pattern: 'alive',
-		isPublic: true,
+		public: true,
 		desc: 'Is Bot Alive?',
+		type: 'user',
 	},
 	async (message, match) => {
 		if (match) {
@@ -21,6 +22,8 @@ bot(
 				mentionedJid: [message.sender],
 			},
 		};
-		return botInfo ? message.send(botInfo, { ...mentionData, caption: msg }) : message.send(msg, mentionData);
+		return botInfo
+			? message.send(botInfo, { ...mentionData, caption: msg })
+			: message.send(msg, mentionData);
 	},
 );

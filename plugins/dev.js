@@ -1,6 +1,6 @@
-import { bot } from '#lib/cmds';
+import { bot } from '#lib';
 import { inspect } from 'util';
-import { isSudo } from '#sql/sudo';
+import { isSudo } from '#sql';
 
 bot(
 	{
@@ -42,8 +42,9 @@ bot(
 bot(
 	{
 		pattern: 'eval ?(.*)',
-		isPublic: false,
+		public: false,
 		desc: 'Evaluate code',
+		type: 'system'
 	},
 	async (message, match) => {
 		const src_code = match || message.reply_message?.text;

@@ -1,17 +1,18 @@
-import { bot } from '#lib/cmds';
-import { addWarn, getWarn, resetWarn } from '#sql/warn';
-import config from '../config.js';
+import { bot } from '#lib';
+import { addWarn, getWarn, resetWarn } from '#sql';
+import config from '#config';
 
 const { WARN_COUNT } = config;
 
 bot(
 	{
 		pattern: 'warn',
-		isPublic: false,
+		public: false,
+		type: "group",
 		desc: 'Warn a user for violating rules',
 	},
 	async (message, match) => {
-		const jid = await message.thatJid(match);
+		const jid = await message.getUserJid(match);
 		const { success, warnings } = await addWarn(jid);
 		if (success) {
 			if (warnings >= WARN_COUNT) {
@@ -33,11 +34,12 @@ bot(
 bot(
 	{
 		pattern: 'getwarn',
-		isPublic: false,
+		public: false,
+		type: "group",
 		desc: 'Check warnings of a user',
 	},
 	async (message, match) => {
-		const jid = await message.thatJid(match);
+		const jid = await message.getUserJid(match);
 		const { warnings } = await getWarn(jid);
 		await message.send(`\`\`\`@${jid.split('@')[0]} has ${warnings} warnings.\`\`\``);
 	},
@@ -46,11 +48,12 @@ bot(
 bot(
 	{
 		pattern: 'resetwarn',
-		isPublic: false,
+		public: false,
+		type: "group",
 		desc: 'Reset warnings of a user',
 	},
 	async (message, match) => {
-		const jid = await message.thatJid(match);
+		const jid = await message.getUserJid(match);
 		const { success } = await resetWarn(jid);
 		if (success) {
 			await message.send('```@' + jid.split('@')[0] + ' is free as a Cow```', { mentions: [jid] });

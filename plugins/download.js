@@ -1,125 +1,148 @@
-import { extractUrlFromString, getBuffer } from 'xstro-utils';
-import { bot } from '#lib/cmds';
-import { fancy } from '#utils/fancy';
-import { facebook, gdrivedl, instagram, tiktok, twitter, youtube } from '#utils/scrapers';
+import { bot } from '#lib';
+import { apkDl, XSTRO } from '#utils';
+import {
+	extractUrlFromString,
+	FileTypeFromBuffer,
+	getBuffer,
+} from 'xstro-utils';
+
+bot(
+	{
+		pattern: 'apk',
+		public: true,
+		desc: 'Downloads Apk',
+		type: 'download',
+	},
+	async (message, match) => {
+		if (!match) return message.send('_Provide Apk to Download_');
+		const res = await apkDl(match);
+		const { appname, link } = res;
+		const buff = await getBuffer(link);
+		return await message.sendMessage(buff, {
+			type: 'document',
+			mimetype: 'application/vnd.android.package-archive',
+			fileName: appname + '.apk',
+		});
+	},
+);
 
 bot(
 	{
 		pattern: 'facebook',
-		isPublic: true,
-		desc: 'Downloads Facebook Videos',
+		public: true,
+		desc: 'Download Facebook Video',
+		type: 'download',
 	},
 	async (message, match) => {
-		const input = match || message.reply_message?.text;
-		if (!input) return message.send('_Invalid URL_');
-		const url = extractUrlFromString(input);
-		if (!url) return message.send('_Invalid URL_');
-		const res = await facebook(url);
-		const video = await getBuffer(res.hd_video);
-		return await message.send(video);
+		let url = match || message.reply_message?.text;
+		if (!url) return message.send('_Provide Facebook link_');
+		url = extractUrlFromString(url);
+		const media = await XSTRO.facebook(url);
+		return await message.send(media);
 	},
 );
 
 bot(
 	{
 		pattern: 'instagram',
-		isPublic: true,
-		desc: 'Downloads Instagram Videos',
+		public: true,
+		desc: 'Download Instagram Video',
+		type: 'download',
 	},
 	async (message, match) => {
-		const input = match || message.reply_message?.text;
-		if (!input) return message.send('_Invalid URL_');
-		const url = extractUrlFromString(input);
-		if (!url) return message.send('_Invalid URL_');
-		const res = await instagram(url);
-		const video = await getBuffer(res.download_url);
-		return await message.send(video);
+		let url = match || message.reply_message?.text;
+		if (!url) return message.send('_Provide Instagram link_');
+		url = extractUrlFromString(url);
+		const media = await XSTRO.instagram(url);
+		return await message.send(media, { type: 'video' });
 	},
 );
 
 bot(
 	{
 		pattern: 'twitter',
-		isPublic: true,
-		desc: 'Downloads X Videos',
+		public: true,
+		desc: 'Download Twitter Video',
+		type: 'download',
 	},
 	async (message, match) => {
-		const input = match || message.reply_message?.text;
-		if (!input) return message.send('_Invalid URL_');
-		const url = extractUrlFromString(input);
-		if (!url) return message.send('_Invalid URL_');
-		const res = await twitter(url);
-		const video = await getBuffer(res.downloads.url);
-		return await message.send(video);
-	},
-);
-
-bot(
-	{
-		pattern: 'tiktok',
-		isPublic: true,
-		desc: 'Downloads Tiktok Videos',
-	},
-	async (message, match) => {
-		const input = match || message.reply_message?.text;
-		if (!input) return message.send('_Invalid URL_');
-		const url = extractUrlFromString(input);
-		if (!url) return message.send('_Invalid URL_');
-		const res = await tiktok(url);
-		const video = await getBuffer(res.video.noWatermark);
-		return await message.send(video, { caption: res.title });
-	},
-);
-
-bot(
-	{
-		pattern: 'gdrive',
-		isPublic: true,
-		desc: 'Downloads Google Drive Documents',
-	},
-	async (message, match) => {
-		const input = match || message.reply_message?.text;
-		if (!input) return message.send('_Invalid URL_');
-		const url = extractUrlFromString(input);
-		if (!url) return message.send('_Invalid URL_');
-		const res = await gdrivedl(url);
-		const doc = await getBuffer(res.link);
-		return await message.send(doc);
-	},
-);
-
-bot(
-	{
-		pattern: 'ytv',
-		isPublic: true,
-		desc: 'Downloads A Youtube Video',
-	},
-	async (message, match) => {
-		const input = match || message.reply_message?.text;
-		if (!input) return message.send('_Invalid URL_');
-		const url = extractUrlFromString(input);
-		if (!url) return message.send('_Invalid URL_');
-		const res = await youtube(url, { ytmp4: true });
-		const { link, thumbnail, title } = res;
-		const video = await getBuffer(link);
-		return await message.send(video, { contextInfo: { isForwarded: true, externalAdReply: { title: fancy(`Xstro youtube downloader`), body: title, mediaType: 1, thumbnail: await getBuffer(thumbnail), sourceUrl: 'https://whatsapp.com/channel/0029VazuKvb7z4kbLQvbn50x', renderLargerThumbnail: true } } });
+		let url = match || message.reply_message?.text;
+		if (!url) return message.send('_Provide Twitter link_');
+		url = extractUrlFromString(url);
+		const media = await XSTRO.twitter(url);
+		return await message.send(media, { type: 'video' });
 	},
 );
 
 bot(
 	{
 		pattern: 'yta',
-		isPublic: true,
-		desc: 'Downloads A Youtube Audio',
+		public: true,
+		desc: 'Download Youtube Audio',
+		type: 'download',
 	},
 	async (message, match) => {
-		const input = match || message.reply_message?.text;
-		if (!input) return message.send('_Invalid URL_');
-		const url = extractUrlFromString(input);
-		if (!url) return message.send('_Invalid URL_');
-		const res = await youtube(url, { ytmp3: true });
-		const { link, thumbnail, title } = res;
-		const audio = await getBuffer(link);
-		return await message.send(audio, { contextInfo: { isForwarded: true, externalAdReply: { title: title, body: title, mediaType: 1, thumbnail: await getBuffer(thumbnail), sourceUrl: 'https://whatsapp.com/channel/0029VazuKvb7z4kbLQvbn50x', renderLargerThumbnail: true } } });
+		let url = match || message.reply_message?.text;
+		if (!url) return message.send('_Provide Youtube link_');
+		url = extractUrlFromString(url);
+		const media = await XSTRO.youtube(url, { mp3: true });
+		return await message.send(media.url);
+	},
+);
+
+bot(
+	{
+		pattern: 'ytv',
+		public: true,
+		desc: 'Download Youtube Video',
+		type: 'download',
+	},
+	async (message, match) => {
+		let url = match || message.reply_message?.text;
+		if (!url) return message.send('_Provide Youtube link_');
+		url = extractUrlFromString(url);
+		const media = await XSTRO.youtube(url, { mp4: true });
+		return await message.send(media.url, {
+			type: 'video',
+			caption: media.title,
+		});
+	},
+);
+
+bot(
+	{
+		pattern: 'tiktok',
+		public: true,
+		desc: 'Download Tiktok Video',
+		type: 'download',
+	},
+	async (message, match) => {
+		let url = match || message.reply_message?.text;
+		if (!url) return message.send('_Provide Tiktok link_');
+		url = extractUrlFromString(url);
+		const media = await XSTRO.tiktok(url);
+		return await message.send(media.url, { caption: media.title });
+	},
+);
+
+bot(
+	{
+		pattern: 'mediafire',
+		public: true,
+		desc: 'Downloads Mediafire files from url',
+		type: 'download',
+	},
+	async (message, match) => {
+		let url = match || message.reply_message?.text;
+		if (!url) return message.send('_Provide Mediafire link_');
+		url = extractUrlFromString(url);
+		const media = await XSTRO.mediafire(url);
+		const buff = await getBuffer(media.link);
+		const type = await FileTypeFromBuffer(buff);
+		return await message.sendMessage(buff, {
+			type: 'document',
+			mimetype: res.mime[0],
+			fileName: 'file' + type,
+		});
 	},
 );

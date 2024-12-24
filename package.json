@@ -1,14 +1,16 @@
 {
 	"name": "xstro",
-	"version": "1.1.8",
+	"version": "1.1.9",
 	"description": "A simple WhatsApp bot built by AstroX11.",
 	"main": "index.js",
 	"type": "module",
 	"imports": {
-		"#lib/*": "./lib/*.js",
-		"#bot/*": "./bot/*.js",
-		"#sql/*": "./sql/*.js",
-		"#utils/*": "./utils/*.js"
+		"#lib": "./lib/index.js",
+		"#database": "./lib/database.js",
+		"#bot": "./bot/index.js",
+		"#sql": "./sql/index.js",
+		"#utils": "./utils/index.js",
+		"#config": "./config.js"
 	},
 	"scripts": {
 		"start": "pm2 start ecosystem.config.cjs --attach",
@@ -38,15 +40,14 @@
 		"qrcode-terminal": "^0.12.0",
 		"axios": "^1.7.9",
 		"baileys": "github:AstroX11/Baileys",
-		"cheerio": "^1.0.0",
 		"dotenv": "^16.4.7",
 		"express": "^4.21.2",
-		"gifted-downs": "^1.0.2",
 		"pm2": "^5.4.3",
-		"proxy-agent": "^6.5.0",
+		"qrcode-terminal": "^0.12.0",
 		"sequelize": "^6.37.5",
 		"sharp": "^0.33.5",
 		"sqlite3": "^5.1.7",
+		"ws": "^8.18.0",
 		"xstro-utils": "^1.0.2"
 	},
 	"packageManager": "yarn@1.22.22"

@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 
 export const AuthState = DATABASE.define(
 	'AuthState',

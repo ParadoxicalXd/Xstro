@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 
-const BanDB = DATABASE.define(
+export const BanDB = DATABASE.define(
 	'ban',
 	{
 		jid: {
@@ -42,5 +42,3 @@ export const isBanned = async jid => {
 	const bannedUsers = await getBanned();
 	return bannedUsers.includes(jid);
 };
-
-export default BanDB;

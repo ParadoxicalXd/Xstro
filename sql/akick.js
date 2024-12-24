@@ -1,7 +1,7 @@
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 import { DataTypes } from 'sequelize';
 
-const AutoKickDB = DATABASE.define(
+export const AutoKickDB = DATABASE.define(
 	'AutoKick',
 	{
 		groupJid: {
@@ -32,15 +32,8 @@ const AutoKickDB = DATABASE.define(
  * @returns {Promise<boolean>} - True if added successfully, false if already exists.
  */
 export const addAKick = async (groupJid, userJid) => {
-	try {
-		await AutoKickDB.create({ groupJid, userJid });
-		return true;
-	} catch (error) {
-		if (error.name === 'SequelizeUniqueConstraintError') {
-			return false;
-		}
-		throw error;
-	}
+	await AutoKickDB.create({ groupJid, userJid });
+	return true;
 };
 
 /**

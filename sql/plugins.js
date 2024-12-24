@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
-import DATABASE from '#lib/database';
+import { DATABASE } from '#lib';
 
-const PluginDB = DATABASE.define(
+export const PluginDB = DATABASE.define(
 	'PluginsDB',
 	{
 		name: {
@@ -66,5 +66,3 @@ export async function getPlugins() {
 		throw error;
 	}
 }
-
-export default PluginDB;

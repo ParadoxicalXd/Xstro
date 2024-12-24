@@ -1,16 +1,20 @@
-import { bot } from '#lib/cmds';
+import { bot } from '#lib';
 import { extractUrlFromString } from 'xstro-utils';
-import { installPlugin, removePluginByName, listPlugins } from '#utils/plugins';
+import { installPlugin, removePluginByName, listPlugins } from '#utils';
 
 bot(
 	{
 		pattern: 'install ?(.*)',
-		isPublic: false,
+		public: false,
 		desc: 'Installs a Plugin',
+		type: 'plugins',
 	},
 	async (message, match) => {
-		const pluginUrl = extractUrlFromString(match || message.reply_message?.text);
-		if (!pluginUrl.startsWith('https://gist.githubusercontent.com')) return message.send('_Provide a valid Plugin URL_');
+		const pluginUrl = extractUrlFromString(
+			match || message.reply_message?.text,
+		);
+		if (!pluginUrl.startsWith('https://gist.githubusercontent.com'))
+			return message.send('_Provide a valid Plugin URL_');
 
 		try {
 			const pluginName = await installPlugin(pluginUrl);
@@ -24,8 +28,9 @@ bot(
 bot(
 	{
 		pattern: 'delplugin ?(.*)',
-		isPublic: false,
+		public: false,
 		desc: 'Deletes a Plugin',
+		type: 'plugins',
 	},
 	async (message, match) => {
 		if (!match) return message.send('_Provide an installed plugin name_');
@@ -43,12 +48,16 @@ bot(
 bot(
 	{
 		pattern: 'getplugins',
-		isPublic: false,
+		public: false,
 		desc: 'Lists all installed plugins',
+		type: 'plugins',
 	},
 	async message => {
 		const plugins = await listPlugins();
-		const pluginList = plugins.length > 0 ? `_Plugins Installed:_\n${plugins.join('\n')}` : '_No plugins installed_';
+		const pluginList =
+			plugins.length > 0
+				? `_Plugins Installed:_\n${plugins.join('\n')}`
+				: '_No plugins installed_';
 		message.send(pluginList);
 	},
 );
