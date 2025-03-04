@@ -38,7 +38,7 @@
 	"dependencies": {
 		"@ffmpeg-installer/ffmpeg": "^1.1.0",
 		"axios": "^1.7.9",
-		"baileys": "github:AstroX11/Baileys",
+		"baileys": "^6.7.16",
 		"dotenv": "^16.4.7",
 		"fluent-ffmpeg": "^2.1.3",
 		"mathjs": "^14.0.1",
