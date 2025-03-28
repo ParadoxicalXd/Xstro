@@ -50,7 +50,7 @@
 		"sharp": "^0.33.5",
 		"simple-git": "^3.27.0",
 		"sqlite3": "^5.1.7",
-		"xstro-utils": "^1.0.5"
+		
 	},
 	"packageManager": "yarn@1.22.22"
 }
